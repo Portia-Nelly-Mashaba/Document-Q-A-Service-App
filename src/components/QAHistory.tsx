@@ -7,13 +7,15 @@ interface QAHistoryProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   theme: Theme;
+  loading?: boolean;
 }
 
 const QAHistory: React.FC<QAHistoryProps> = ({ 
   qaList, 
   searchQuery, 
   onSearchChange,
-  theme
+  theme,
+  loading = false
 }) => {
   const formatTime = (date: Date) => {
     const now = new Date();
@@ -52,7 +54,16 @@ const QAHistory: React.FC<QAHistoryProps> = ({
       </div>
       
       <div className="qa-list">
-        {qaList.length === 0 ? (
+        {loading ? (
+          <div className="loading-skeleton-qa">
+            {[1, 2].map(i => (
+              <div key={i} className="qa-item-skeleton">
+                <div className="skeleton-qa-bubble"></div>
+                <div className="skeleton-qa-answer"></div>
+              </div>
+            ))}
+          </div>
+        ) : qaList.length === 0 ? (
           <div className="empty-state">
             {searchQuery ? 'No matching Q&A found' : 'No questions yet. Ask something!'}
           </div>

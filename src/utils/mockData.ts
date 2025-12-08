@@ -6,6 +6,7 @@ export const mockDocuments: Document[] = [
     id: '1',
     name: 'Project_Requirements.pdf',
     size: '2.3 MB',
+    sizeInBytes: 2411725, // 2.3 * 1024 * 1024
     uploadDate: new Date('2024-01-15'),
     type: 'pdf'
   },
@@ -13,6 +14,7 @@ export const mockDocuments: Document[] = [
     id: '2',
     name: 'Technical_Specification.docx',
     size: '1.2 MB',
+    sizeInBytes: 1258291, // 1.2 * 1024 * 1024
     uploadDate: new Date('2024-01-16'),
     type: 'docx'
   },
@@ -20,6 +22,7 @@ export const mockDocuments: Document[] = [
     id: '3',
     name: 'API_Documentation.md',
     size: '554.6 KB',
+    sizeInBytes: 567910, // 554.6 * 1024
     uploadDate: new Date('2024-01-17'),
     type: 'md'
   },
@@ -27,6 +30,7 @@ export const mockDocuments: Document[] = [
     id: '4',
     name: 'Coding_TypesScript_Interview_Package.pdf',
     size: '691 KB',
+    sizeInBytes: 707584, // 691 * 1024
     uploadDate: new Date('2024-01-18'),
     type: 'pdf'
   }

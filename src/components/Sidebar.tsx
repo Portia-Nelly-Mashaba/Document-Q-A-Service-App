@@ -11,6 +11,7 @@ interface SidebarProps {
   onThemeToggle: () => void;
   onExport: () => void;
   onUploadClick: () => void;
+  loading?: boolean;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -20,7 +21,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   theme,
   onThemeToggle,
   onExport,
-  onUploadClick
+  onUploadClick,
+  loading = false
 }) => {
   return (
     <div className={`sidebar ${theme}`}>
@@ -50,6 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         documents={documents}
         selectedDoc={selectedDoc}
         onSelectDoc={onSelectDoc}
+        loading={loading}
       />
       
       <div className="sidebar-footer">

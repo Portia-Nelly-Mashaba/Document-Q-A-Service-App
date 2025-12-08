@@ -3,7 +3,8 @@
 export interface Document {
     id: string;
     name: string;
-    size: string;
+    size: string; // Formatted size (e.g., "2.5 MB")
+    sizeInBytes: number; // Raw file size in bytes
     uploadDate: Date;
     type: string;
   }

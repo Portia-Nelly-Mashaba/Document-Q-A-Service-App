@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import ErrorBoundary from './components/ErrorBoundary';
 import Sidebar from './components/Sidebar';
 import UploadModal from './components/UploadModal';
 import QASection from './components/QASection';
@@ -21,13 +22,15 @@ function App() {
     setSelectedDoc,
     uploadDocument,
     uploading,
-    uploadProgress
+    uploadProgress,
+    loading: documentsLoading
   } = useDocuments();
 
   const {
     qaHistory,
     askQuestion,
     loading: qaLoading,
+    initialLoading: qaInitialLoading,
     searchQuery,
     setSearchQuery,
     exportHistory
@@ -54,6 +57,10 @@ function App() {
     }
   };
 
+  const handleUploadError = (message: string) => {
+    showToast(message, 'error');
+  };
+
   const handleAskQuestion = async (question: string) => {
     if (!selectedDoc) {
       showToast('Please select a document first', 'info');
@@ -77,54 +84,59 @@ function App() {
   };
 
   return (
-    <div className={`app ${theme}`}>
-      <Sidebar
-        documents={documents}
-        selectedDoc={selectedDoc}
-        onSelectDoc={setSelectedDoc}
-        theme={theme}
-        onThemeToggle={handleThemeToggle}
-        onExport={exportHistory}
-        onUploadClick={() => setShowUploadModal(true)}
-      />
-      
-      <main className="main-content">
-        <div className="content-header">
-          <h2>{selectedDoc?.name || 'Select a document'}</h2>
-          <p>Ask questions about this document</p>
-        </div>
-        
-        <div className="qa-container">
-          <QAHistory
-            qaList={qaHistory}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            theme={theme}
-          />
-          
-          <QASection
-            onAskQuestion={handleAskQuestion}
-            loading={qaLoading}
-          />
-        </div>
-      </main>
-
-      <UploadModal
-        isOpen={showUploadModal}
-        onClose={() => setShowUploadModal(false)}
-        onUpload={handleUpload}
-        uploading={uploading}
-        progress={uploadProgress}
-      />
-
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
+    <ErrorBoundary>
+      <div className={`app ${theme}`}>
+        <Sidebar
+          documents={documents}
+          selectedDoc={selectedDoc}
+          onSelectDoc={setSelectedDoc}
+          theme={theme}
+          onThemeToggle={handleThemeToggle}
+          onExport={exportHistory}
+          onUploadClick={() => setShowUploadModal(true)}
+          loading={documentsLoading}
         />
-      )}
-    </div>
+        
+        <main className="main-content">
+          <div className="content-header">
+            <h2>{selectedDoc?.name || 'Select a document'}</h2>
+            <p>Ask questions about this document</p>
+          </div>
+          
+          <div className="qa-container">
+            <QAHistory
+              qaList={qaHistory}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              theme={theme}
+              loading={qaInitialLoading}
+            />
+            
+            <QASection
+              onAskQuestion={handleAskQuestion}
+              loading={qaLoading}
+            />
+          </div>
+        </main>
+
+        <UploadModal
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          onUpload={handleUpload}
+          uploading={uploading}
+          progress={uploadProgress}
+          onError={handleUploadError}
+        />
+
+        {toast && (
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
+        )}
+      </div>
+    </ErrorBoundary>
   );
 }
 

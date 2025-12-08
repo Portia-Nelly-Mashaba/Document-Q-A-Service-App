@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -6,29 +6,82 @@ interface UploadModalProps {
   onUpload: (file: File) => void;
   uploading: boolean;
   progress: number;
+  onError?: (message: string) => void;
 }
+
+const ALLOWED_TYPES = ['pdf', 'docx', 'doc', 'md', 'txt', 'json'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const UploadModal: React.FC<UploadModalProps> = ({
   isOpen,
   onClose,
   onUpload,
   uploading,
-  progress
+  progress,
+  onError
 }) => {
   const [dragOver, setDragOver] = useState(false);
+  const [validationError, setValidationError] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const validateFile = (file: File): string | null => {
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    
+    if (!fileExtension || !ALLOWED_TYPES.includes(fileExtension)) {
+      return `File type not supported. Allowed types: ${ALLOWED_TYPES.join(', ').toUpperCase()}`;
+    }
+    
+    if (file.size > MAX_FILE_SIZE) {
+      return `File size exceeds limit. Maximum size: ${(MAX_FILE_SIZE / (1024 * 1024)).toFixed(0)}MB`;
+    }
+    
+    return null;
+  };
+
+  // Reset processing flag when upload completes
+  useEffect(() => {
+    if (!uploading && progress === 0) {
+      setIsProcessing(false);
+    }
+  }, [uploading, progress]);
+
+  const handleFile = useCallback((file: File) => {
+    // Prevent duplicate processing
+    if (isProcessing || uploading) {
+      return;
+    }
+
+    setIsProcessing(true);
+    const error = validateFile(file);
+    if (error) {
+      setValidationError(error);
+      if (onError) {
+        onError(error);
+      }
+      setTimeout(() => {
+        setValidationError('');
+        setIsProcessing(false);
+      }, 5000);
+      return;
+    }
+    
+    setValidationError('');
+    onUpload(file);
+  }, [onUpload, onError, isProcessing, uploading]);
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     setDragOver(false);
     
-    if (uploading) return;
+    if (uploading || isProcessing) return;
     
     const files = e.dataTransfer.files;
     if (files.length > 0) {
-      onUpload(files[0]);
+      handleFile(files[0]);
     }
-  }, [onUpload, uploading]);
+  }, [handleFile, uploading, isProcessing]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -50,10 +103,14 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files && files.length > 0) {
-      onUpload(files[0]);
+    if (files && files.length > 0 && !uploading && !isProcessing) {
+      handleFile(files[0]);
     }
-  }, [onUpload]);
+    // Reset input so same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [handleFile, uploading, isProcessing]);
 
   if (!isOpen) return null;
 
@@ -99,7 +156,10 @@ const UploadModal: React.FC<UploadModalProps> = ({
               </div>
               <h2>Upload Documents</h2>
               <p>Drag and drop files or click to browse</p>
-              <p className="modal-upload-hint">Supports PDF, DOCX, TXT, MD, JSON</p>
+              <p className="modal-upload-hint">Supports PDF, DOCX, TXT, MD, JSON (Max 10MB)</p>
+              {validationError && (
+                <div className="upload-validation-error">{validationError}</div>
+              )}
             </>
           )}
         </div>
