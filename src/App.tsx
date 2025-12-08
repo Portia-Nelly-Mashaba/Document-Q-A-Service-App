@@ -1,16 +1,129 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
 import './App.css';
+import Sidebar from './components/Sidebar';
+import UploadModal from './components/UploadModal';
+import QASection from './components/QASection';
+import QAHistory from './components/QAHistory';
+import Toast from './components/Toast';
+import useDocuments from './hooks/useDocuments';
+import useQA from './hooks/useQA';
+import useLocalStorage from './hooks/useLocalStorage';
+import { Theme } from './types';
 
 function App() {
+  const [theme, setTheme] = useLocalStorage<Theme>('theme', 'light');
+  const [toast, setToast] = useState<{message: string; type: 'success' | 'error' | 'info'} | null>(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+
+  const {
+    documents,
+    selectedDoc,
+    setSelectedDoc,
+    uploadDocument,
+    uploading,
+    uploadProgress
+  } = useDocuments();
+
+  const {
+    qaHistory,
+    askQuestion,
+    loading: qaLoading,
+    searchQuery,
+    setSearchQuery,
+    exportHistory
+  } = useQA(selectedDoc?.id);
+
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
+
+  useEffect(() => {
+    if (!uploading && uploadProgress === 100) {
+      setTimeout(() => {
+        setShowUploadModal(false);
+      }, 500);
+    }
+  }, [uploading, uploadProgress]);
+
+  const handleUpload = async (file: File) => {
+    try {
+      uploadDocument(file);
+      showToast('Document uploaded successfully!', 'success');
+    } catch (error) {
+      showToast('Upload failed. Please try again.', 'error');
+    }
+  };
+
+  const handleAskQuestion = async (question: string) => {
+    if (!selectedDoc) {
+      showToast('Please select a document first', 'info');
+      return;
+    }
+    
+    try {
+      await askQuestion(question, selectedDoc.id);
+      showToast('Answer generated!', 'success');
+    } catch (error) {
+      showToast('Failed to get answer', 'error');
+    }
+  };
+
+  const handleThemeToggle = () => {
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToast({ message, type });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          My Document Q and A app
-        </p>
+    <div className={`app ${theme}`}>
+      <Sidebar
+        documents={documents}
+        selectedDoc={selectedDoc}
+        onSelectDoc={setSelectedDoc}
+        theme={theme}
+        onThemeToggle={handleThemeToggle}
+        onExport={exportHistory}
+        onUploadClick={() => setShowUploadModal(true)}
+      />
+      
+      <main className="main-content">
+        <div className="content-header">
+          <h2>{selectedDoc?.name || 'Select a document'}</h2>
+          <p>Ask questions about this document</p>
+        </div>
         
-      </header>
+        <div className="qa-container">
+          <QAHistory
+            qaList={qaHistory}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            theme={theme}
+          />
+          
+          <QASection
+            onAskQuestion={handleAskQuestion}
+            loading={qaLoading}
+          />
+        </div>
+      </main>
+
+      <UploadModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUpload={handleUpload}
+        uploading={uploading}
+        progress={uploadProgress}
+      />
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }

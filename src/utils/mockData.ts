@@ -1,0 +1,44 @@
+import { Document, QA } from '../types';
+
+// Mock documents data
+export const mockDocuments: Document[] = [
+  {
+    id: '1',
+    name: 'Project_Requirements.pdf',
+    size: '2.3 MB',
+    uploadDate: new Date('2024-01-15'),
+    type: 'pdf'
+  },
+  {
+    id: '2',
+    name: 'Technical_Specification.docx',
+    size: '1.2 MB',
+    uploadDate: new Date('2024-01-16'),
+    type: 'docx'
+  },
+  {
+    id: '3',
+    name: 'API_Documentation.md',
+    size: '554.6 KB',
+    uploadDate: new Date('2024-01-17'),
+    type: 'md'
+  },
+  {
+    id: '4',
+    name: 'Coding_TypesScript_Interview_Package.pdf',
+    size: '691 KB',
+    uploadDate: new Date('2024-01-18'),
+    type: 'pdf'
+  }
+];
+
+// Mock Q&A data
+export const mockQA: QA[] = [
+  {
+    id: '1',
+    documentId: '1',
+    question: 'What are the main requirements?',
+    answer: 'The document provides detailed specifications: interface Configuration { maxConnections: number; timeout: number; retryAttempts: number; } These settings should be configured based on your environment requirements.',
+    timestamp: new Date(Date.now() - 23 * 60 * 1000) // 23 minutes ago
+  }
+];
