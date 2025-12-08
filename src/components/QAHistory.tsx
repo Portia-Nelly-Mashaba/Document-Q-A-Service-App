@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import { QA } from '../types';
 import { Theme } from '../types';
 
@@ -85,7 +86,9 @@ const QAHistory: React.FC<QAHistoryProps> = ({
                 </div>
               </div>
               <div className="qa-answer-bubble">
-                <div className="answer-text">{qa.answer}</div>
+                <div className="answer-text">
+                  <ReactMarkdown>{qa.answer}</ReactMarkdown>
+                </div>
               </div>
             </div>
           ))

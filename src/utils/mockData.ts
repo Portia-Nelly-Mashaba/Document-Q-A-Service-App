@@ -42,7 +42,7 @@ export const mockQA: QA[] = [
     id: '1',
     documentId: '1',
     question: 'What are the main requirements?',
-    answer: 'The document provides detailed specifications: interface Configuration { maxConnections: number; timeout: number; retryAttempts: number; } These settings should be configured based on your environment requirements.',
+    answer: 'The document provides detailed specifications:\n\n```typescript\ninterface Configuration {\n  maxConnections: number;\n  timeout: number;\n  retryAttempts: number;\n}\n```\n\nThese settings should be configured based on your **environment requirements**.',
     timestamp: new Date(Date.now() - 23 * 60 * 1000) // 23 minutes ago
   }
 ];
