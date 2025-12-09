@@ -15,6 +15,12 @@ export interface Document {
     question: string;
     answer: string;
     timestamp: Date;
+    metadata?: {
+      source: 'ai' | 'mock';
+      responseTime?: number;
+      model?: string;
+      isError?: boolean;
+    };
   }
   
   export interface Configuration {
