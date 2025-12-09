@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Document } from '../types';
 import DocumentList from './DocumentList';
 import ThemeToggle from './ThemeToggle';
+import KeyboardShortcutsModal from './KeyboardShortcutsModal';
 
 interface SidebarProps {
   documents: Document[];
@@ -24,6 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onUploadClick,
   loading = false
 }) => {
+  const [showShortcuts, setShowShortcuts] = useState(false);
   return (
     <div className={`sidebar ${theme}`}>
       <div className="sidebar-header">
@@ -63,7 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </svg>
           Export Q&A History
         </button>
-        <button className="footer-link">
+        <button className="footer-link" onClick={() => setShowShortcuts(true)}>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginRight: '8px' }}>
             <rect x="2" y="4" width="12" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" fill="none"/>
             <path d="M5 7H11M5 9H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -72,6 +74,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         </button>
         <ThemeToggle theme={theme} onToggle={onThemeToggle} />
       </div>
+      {showShortcuts && (
+        <KeyboardShortcutsModal onClose={() => setShowShortcuts(false)} />
+      )}
     </div>
   );
 };

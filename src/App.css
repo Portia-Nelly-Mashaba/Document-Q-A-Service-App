@@ -539,10 +539,15 @@ body.dark {
 .ask-button-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Show spinner only when loading class is present (prevents spinner when simply disabled)
+   QASection will add 'loading' class to the button while waiting for an answer */
+.ask-button-primary.loading {
   position: relative;
 }
 
-.ask-button-primary:disabled::after {
+.ask-button-primary.loading::after {
   content: '';
   position: absolute;
   width: 12px;
@@ -963,6 +968,62 @@ body.dark {
   display: flex;
   align-items: center;
 }
+
+/* Keyboard Shortcuts modal specific styles */
+.keyboard-modal {
+  max-width: 520px;
+  padding: 20px 24px;
+  background: #ffffff;
+  color: #000000;
+}
+
+.keyboard-modal .footer-link {
+  display: inline-block;
+  width: auto;
+  padding: 8px 12px;
+  margin-right: 8px;
+  background: #f3f4f6; /* light grey */
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #000000;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.keyboard-modal .footer-link.active {
+  background: #e5e5e5; /* slightly darker grey to indicate active */
+  border-color: #d1d5db;
+}
+
+.keyboard-modal .shortcuts-list {
+  margin-top: 12px;
+  border-top: 1px solid #efefef;
+  padding-top: 12px;
+}
+
+.keyboard-modal .shortcuts-list > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f6f6f6;
+}
+
+.keyboard-modal code {
+  background: #f3f4f6;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #000000;
+}
+
+/* Ensure close button stays monochrome */
+.keyboard-modal .modal-close {
+  color: #6b7280;
+  background: transparent;
+}
+
 
 .sidebar.light .theme-toggle {
   background: #f3f4f6;

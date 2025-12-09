@@ -54,6 +54,22 @@ const QASection: React.FC<QASectionProps> = ({ onAskQuestion, loading }) => {
   const isNearLimit = question.length > maxLength * 0.9;
   const isAtLimit = question.length >= maxLength;
 
+  // Show platform specific shortcut hint
+  const [shortcutHint, setShortcutHint] = useState('⌘ + Enter');
+
+  useEffect(() => {
+    try {
+      const platform = navigator?.platform || '';
+      if (/Win/i.test(platform)) {
+        setShortcutHint('Ctrl + Enter');
+      } else {
+        setShortcutHint('⌘ + Enter');
+      }
+    } catch (e) {
+      setShortcutHint('⌘ + Enter');
+    }
+  }, []);
+
   return (
     <div className="qa-section">
       <div className={`question-input-wrapper ${error && touched ? 'has-error' : ''} ${isAtLimit ? 'at-limit' : ''}`}>
@@ -75,29 +91,15 @@ const QASection: React.FC<QASectionProps> = ({ onAskQuestion, loading }) => {
             <span className={`char-count ${isNearLimit ? 'warning' : ''} ${isAtLimit ? 'error' : ''}`}>
               {question.length}/{maxLength}
             </span>
-            <span className="shortcut-hint-text">Press ⌘ + Enter to submit</span>
+            <span className="shortcut-hint-text">Press {shortcutHint} to submit</span>
           </div>
           <div className="question-input-right">
             <button 
-              className="question-icon-button" 
-              title="Send"
-              onClick={handleSubmit}
-              disabled={!question.trim() || loading}
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M2 10L18 2L12 10L18 18L2 10Z" fill="currentColor"/>
-              </svg>
-            </button>
-            <button className="question-icon-button" title="Broadcast">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <circle cx="10" cy="10" r="3" fill="currentColor"/>
-                <path d="M10 1V3M10 17V19M19 10H17M3 10H1M16.66 3.34L15.24 4.76M4.76 15.24L3.34 16.66M16.66 16.66L15.24 15.24M4.76 4.76L3.34 3.34" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </button>
-            <button 
               onClick={handleSubmit} 
               disabled={!question.trim() || loading}
-              className="ask-button-primary"
+              className={`ask-button-primary ${loading ? 'loading' : ''}`}
+              aria-disabled={!question.trim() || loading}
+              data-loading={loading ? 'true' : 'false'}
             >
               {loading ? 'Thinking...' : 'Ask'}
             </button>
